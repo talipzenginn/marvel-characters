@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
+import 'package:marvel_characters/view/home/viewmodel/home_viewmodel.dart';
+import 'package:provider/provider.dart';
 import 'core/init/navigation/router.gr.dart';
 
 void main() async {
@@ -15,7 +17,9 @@ void main() async {
 }
 
 Future initialization(BuildContext? context) async {
-  await Future.delayed(const Duration(milliseconds: 500));
+  await Future.delayed(
+    const Duration(milliseconds: 500),
+  );
 }
 
 final getIt = GetIt.instance;
@@ -27,10 +31,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerDelegate: AutoRouterDelegate(router),
-      routeInformationParser: router.defaultRouteParser(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => HomeViewmodel(),
+        ),
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerDelegate: AutoRouterDelegate(router),
+        routeInformationParser: router.defaultRouteParser(),
+      ),
     );
   }
 }

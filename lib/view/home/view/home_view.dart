@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/components/button_style.dart';
 import '../../../core/init/navigation/router.gr.dart';
 import 'package:shimmer/shimmer.dart';
@@ -17,58 +18,81 @@ class HomeView extends StatefulWidget {
 }
 
 class HomeViewState extends State<HomeView> {
-  late HomeViewmodel viewModel;
-  @override
-  void initState() {
-    super.initState();
-    viewModel = HomeViewmodel();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final ScrollController controller = ScrollController();
-
-    void _scrollDown() {
-      controller.animateTo(
-        controller.position.maxScrollExtent,
-        duration: const Duration(seconds: 2),
-        curve: Curves.fastOutSlowIn,
-      );
-    }
-
-    return Scaffold(
-      floatingActionButton: FloatingActionButton.small(
-        onPressed: _scrollDown,
-        child: const Icon(Icons.arrow_downward),
-      ),
-      appBar: appBar(),
-      body: SafeArea(
-        child: Padding(
-          padding: context.paddingLowVertical,
-          child: CustomFutureBuilder(
-            future: viewModel.getCharacterList(),
-            loading: shimmerForAll(),
-            notFoundWidget: notFoundWidget(),
-            onSuccess: (data) {
-              dynamic response = data;
-              return Column(
-                children: [
-                  Expanded(
-                    child: buildGridView(
-                      response,
-                      controller,
+    return Consumer<HomeViewmodel>(
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (viewModel.offset != 0)
+                TextButton(
+                  style: buttonStyle(context),
+                  onPressed: viewModel.previousPage,
+                  child: Padding(
+                    padding: context.paddingLow,
+                    child: const Text(
+                      AppConstants.previousPageButtonText,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
-                ],
-              );
-            },
+                ),
+              const SizedBox(
+                width: 20,
+              ),
+              if (viewModel.countOfCharacters - 30 >= viewModel.offset)
+                TextButton(
+                  style: buttonStyle(context),
+                  onPressed: () {
+                    viewModel.nextPage(viewModel.countOfCharacters);
+                  },
+                  child: Padding(
+                    padding: context.paddingLow,
+                    child: const Text(
+                      AppConstants.nextPageButtonText,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-        ),
-      ),
+          appBar: appBar(),
+          body: SafeArea(
+            child: Padding(
+              padding: context.paddingLowVertical,
+              child: CustomFutureBuilder(
+                future: viewModel.getCharacterList(viewModel.offset),
+                loading: shimmerForAll(),
+                notFoundWidget: notFoundWidget(viewModel),
+                onSuccess: (data) {
+                  dynamic response = data;
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: buildGridView(
+                          response,
+                          viewModel,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Column notFoundWidget() {
+  Column notFoundWidget(viewModel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,12 +108,12 @@ class HomeViewState extends State<HomeView> {
         SizedBox(
           height: context.lowValue,
         ),
-        tryAgainButton(),
+        tryAgainButton(viewModel),
       ],
     );
   }
 
-  Widget tryAgainButton() {
+  Widget tryAgainButton(viewModel) {
     return Padding(
       padding: context.paddingLow,
       child: TextButton(
@@ -107,7 +131,7 @@ class HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget buildGridView(List characterList, ScrollController controller) {
+  Widget buildGridView(List characterList, viewModel) {
     List<Widget> widgets = characterList
         .map(
           (e) => Padding(
@@ -128,40 +152,11 @@ class HomeViewState extends State<HomeView> {
           ),
         )
         .toList();
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        if (scrollNotification is ScrollEndNotification) {
-          controller.addListener(
-            () {
-              double maxScroll = controller.position.maxScrollExtent;
-              double currentScroll = controller.position.pixels;
-              if (currentScroll == maxScroll) {
-                Future.delayed(
-                  const Duration(seconds: 1),
-                ).then((value) {
-                  viewModel.nextPage();
-                  setState(() {});
-                });
-              } else if (currentScroll == 0) {
-                Future.delayed(
-                  const Duration(seconds: 1),
-                ).then((value) {
-                  viewModel.previousPage();
-                  setState(() {});
-                });
-              }
-            },
-          );
-        }
-        return true;
-      },
-      child: GridView.count(
-        controller: controller,
-        scrollDirection: Axis.vertical,
-        crossAxisCount: 2,
-        shrinkWrap: false,
-        children: widgets,
-      ),
+    return GridView.count(
+      scrollDirection: Axis.vertical,
+      crossAxisCount: 2,
+      shrinkWrap: false,
+      children: widgets,
     );
   }
 

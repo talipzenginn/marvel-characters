@@ -12,7 +12,7 @@ class CharacterResponseModel {
     var characterMapsList = hashMap['results'];
     return CharacterResponseModel(
       characterMapsList: characterMapsList,
-      count: hashMap['count'],
+      count: hashMap['total'],
     );
   }
 }
