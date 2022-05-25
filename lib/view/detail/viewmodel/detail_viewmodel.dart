@@ -19,11 +19,16 @@ class DetailViewmodel {
       comicList.clear();
       for (int i = 0; i < comicResponse.comicsMapsList!.length; i++) {
         var comicsMap = comicResponse.comicsMapsList![i];
-        comicList.add(
-          ComicModel(
-            title: comicsMap['title'],
-          ),
-        );
+        DateTime dateTime = DateTime.parse(comicsMap['dates'][0]['date']);
+
+        if (dateTime.isAfter(DateTime(2005))) {
+          comicList.add(
+            ComicModel(
+              title: comicsMap['title'],
+              onsaleDate: dateTime,
+            ),
+          );
+        }
       }
     } catch (e) {
       rethrow;

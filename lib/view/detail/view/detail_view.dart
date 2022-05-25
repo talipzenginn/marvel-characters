@@ -135,14 +135,14 @@ class DetailViewState extends State<DetailView> {
               (e) => Padding(
                 padding: context.paddingNormal,
                 child: Text(
-                  e.title ?? AppConstants.noComics,
+                  '${e.title} ----- ${e.onsaleDate.day}.${e.onsaleDate.month}.${e.onsaleDate.year}',
                   style: context.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               ),
             )
             .toList()
-        : [];
+        : [const Text(AppConstants.noComics)];
     return Column(
       children: widgets,
     );

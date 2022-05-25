@@ -1,4 +1,8 @@
 class ComicModel {
   String? title;
-  ComicModel({this.title});
+  DateTime? onsaleDate;
+  ComicModel({
+    this.title,
+    this.onsaleDate,
+  });
 }
