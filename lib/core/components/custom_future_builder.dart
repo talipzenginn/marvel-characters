@@ -24,6 +24,10 @@ class CustomFutureBuilder<T> extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
+            return loading ??
+                const Center(
+                  child: CircularProgressIndicator(),
+                );
           case ConnectionState.active:
             return loading ??
                 const Center(

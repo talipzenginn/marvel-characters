@@ -1,16 +1,18 @@
 import 'dart:collection';
 
-class ResponseModel {
+class CharacterResponseModel {
   List? characterMapsList;
+  int? count;
 
-  ResponseModel({this.characterMapsList});
+  CharacterResponseModel({this.characterMapsList, this.count});
 
-  factory ResponseModel.fromJson(Map<String, dynamic> json) {
+  factory CharacterResponseModel.fromJson(Map<String, dynamic> json) {
     LinkedHashMap<dynamic, dynamic> map = json['data'];
     var hashMap = HashMap.from(map);
     var characterMapsList = hashMap['results'];
-    return ResponseModel(
+    return CharacterResponseModel(
       characterMapsList: characterMapsList,
+      count: hashMap['count'],
     );
   }
 }

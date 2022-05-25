@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../core/components/button_style.dart';
 import '../../../core/init/navigation/router.gr.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../core/extension/context_extensions.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../core/components/button_style.dart';
 import '../../../core/components/custom_future_builder.dart';
 import '../../../main.dart';
 import '../viewmodel/home_viewmodel.dart';
@@ -24,38 +24,23 @@ class HomeViewState extends State<HomeView> {
     viewModel = HomeViewmodel();
   }
 
-  Widget buildGridView(List characterList) {
-    List<Widget> widgets = characterList
-        .map(
-          (e) => Padding(
-            padding: const EdgeInsets.all(1),
-            child: GestureDetector(
-              onTap: () {
-                router.push(
-                  DetailRoute(characterModel: e),
-                );
-              },
-              child: Column(
-                children: [
-                  Expanded(flex: 5, child: patchOfCharacter(e)),
-                  Expanded(flex: 1, child: nameOfCharacter(e)),
-                ],
-              ),
-            ),
-          ),
-        )
-        .toList();
-    return GridView.count(
-      scrollDirection: Axis.vertical,
-      crossAxisCount: 2,
-      shrinkWrap: false,
-      children: widgets,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ScrollController controller = ScrollController();
+
+    void _scrollDown() {
+      controller.animateTo(
+        controller.position.maxScrollExtent,
+        duration: const Duration(seconds: 2),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
+
     return Scaffold(
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: _scrollDown,
+        child: const Icon(Icons.arrow_downward),
+      ),
       appBar: appBar(),
       body: SafeArea(
         child: Padding(
@@ -69,14 +54,10 @@ class HomeViewState extends State<HomeView> {
               return Column(
                 children: [
                   Expanded(
-                    child: buildGridView(response),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      previousPageButton(),
-                      nextPageButton(),
-                    ],
+                    child: buildGridView(
+                      response,
+                      controller,
+                    ),
                   ),
                 ],
               );
@@ -108,52 +89,12 @@ class HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget nextPageButton() {
-    return Padding(
-      padding: context.paddingLow,
-      child: TextButton(
-           onPressed: () {
-          viewModel.nextPage();
-          setState(() {});
-        },
-        style: buttonStyle(context),
-        child: Padding(
-          padding: context.paddingLow,
-          child: Text(
-            AppConstants.nextPageButtonText,
-            style: context.textTheme.button,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget previousPageButton() {
-    return Padding(
-      padding: context.paddingLow,
-      child: FloatingActionButton(
-        onPressed: () {
-          viewModel.previousPage();
-          setState(() {});
-        },
-        child: Padding(
-          padding: context.paddingLow,
-          child: Text(
-            AppConstants.previousPageButtonText,
-            style: context.textTheme.button,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget tryAgainButton() {
     return Padding(
       padding: context.paddingLow,
-      child: FloatingActionButton(
+      child: TextButton(
         onPressed: viewModel.tryAgain,
+        style: buttonStyle(context),
         child: Padding(
           padding: context.paddingLow,
           child: Text(
@@ -162,6 +103,64 @@ class HomeViewState extends State<HomeView> {
             textAlign: TextAlign.center,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildGridView(List characterList, ScrollController controller) {
+    List<Widget> widgets = characterList
+        .map(
+          (e) => Padding(
+            padding: const EdgeInsets.all(1),
+            child: GestureDetector(
+              onTap: () {
+                router.push(
+                  DetailRoute(characterModel: e),
+                );
+              },
+              child: Column(
+                children: [
+                  Expanded(flex: 5, child: patchOfCharacter(e)),
+                  Expanded(flex: 1, child: nameOfCharacter(e)),
+                ],
+              ),
+            ),
+          ),
+        )
+        .toList();
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollEndNotification) {
+          controller.addListener(
+            () {
+              double maxScroll = controller.position.maxScrollExtent;
+              double currentScroll = controller.position.pixels;
+              if (currentScroll == maxScroll) {
+                Future.delayed(
+                  const Duration(seconds: 1),
+                ).then((value) {
+                  viewModel.nextPage();
+                  setState(() {});
+                });
+              } else if (currentScroll == 0) {
+                Future.delayed(
+                  const Duration(seconds: 1),
+                ).then((value) {
+                  viewModel.previousPage();
+                  setState(() {});
+                });
+              }
+            },
+          );
+        }
+        return true;
+      },
+      child: GridView.count(
+        controller: controller,
+        scrollDirection: Axis.vertical,
+        crossAxisCount: 2,
+        shrinkWrap: false,
+        children: widgets,
       ),
     );
   }
