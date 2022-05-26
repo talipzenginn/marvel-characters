@@ -1,0 +1,1 @@
+enum PageButtonEnum { previous, next }

@@ -1,5 +1,6 @@
 class AppConstants {
-  static const baseUrl = "http://gateway.marvel.com/v1/public/";
+  static const baseUrl = 'http://gateway.marvel.com/v1/public/';
+  static const publicKey= '13c8b0b85196e641d2f5148494f69e63';
   static const appBarTitle = 'Marvel Characters';
   static const errorText = 'An error has occured!';
   static const emptyText =

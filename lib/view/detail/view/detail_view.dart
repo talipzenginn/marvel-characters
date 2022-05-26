@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:marvel_characters/view/home/model/character_model.dart';
-import 'package:shimmer/shimmer.dart';
+import '../../../core/components/not_found_widget.dart';
+import '../../../core/components/shimmers.dart';
+import './/view/home/model/character_model.dart';
 import '../../../../core/extension/context_extensions.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../core/components/button_style.dart';
 import '../../../core/components/custom_future_builder.dart';
 import '../viewmodel/detail_viewmodel.dart';
 
@@ -35,8 +35,10 @@ class DetailViewState extends State<DetailView> {
             child: Center(
               child: CustomFutureBuilder(
                 future: viewModel.getResponse(widget.characterModel),
-                loading: shimmerForAll(),
-                notFoundWidget: notFoundWidget(),
+                loading: const ShimmerForAll(),
+                notFoundWidget: NotFoundWidget(
+                  onPressed: viewModel.tryAgain,
+                ),
                 onSuccess: (data) {
                   dynamic response = data;
                   return Column(
@@ -58,51 +60,12 @@ class DetailViewState extends State<DetailView> {
     );
   }
 
-  Column notFoundWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: context.highValue * 3.3,
-        ),
-        Text(
-          AppConstants.emptyText,
-          style: context.textTheme.subtitle1,
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(
-          height: context.lowValue,
-        ),
-        tryAgainButton(),
-      ],
-    );
-  }
-
-  Widget tryAgainButton() {
-    return Padding(
-      padding: context.paddingLow,
-      child: TextButton(
-        onPressed: viewModel.tryAgain,
-        style: buttonStyle(context),
-        child: Padding(
-          padding: context.paddingLow,
-          child: Text(
-            AppConstants.tryAgainButtonText,
-            style: context.textTheme.button,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
-
   SizedBox photoOfCharacter(response) {
     return SizedBox(
       height: context.highValue * 3,
       child: CachedNetworkImage(
         imageUrl: widget.characterModel.photoURL!,
-        placeholder: (context, url) => imageShimmer(),
+        placeholder: (context, url) => const ImageShimmer(),
         errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
@@ -145,45 +108,6 @@ class DetailViewState extends State<DetailView> {
         : [const Text(AppConstants.noComics)];
     return Column(
       children: widgets,
-    );
-  }
-
-  Shimmer shimmerForAll() {
-    return Shimmer.fromColors(
-      baseColor: context.colorScheme.background,
-      highlightColor: context.colorScheme.tertiary,
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            width: context.highValue * 3,
-            height: context.highValue * 3,
-          ),
-          Container(
-              margin: EdgeInsets.only(top: context.normalValue),
-              color: Colors.transparent,
-              width: context.highValue * 4,
-              height: context.mediumValue),
-        ],
-      ),
-    );
-  }
-
-  Shimmer imageShimmer() {
-    return Shimmer.fromColors(
-      baseColor: context.colorScheme.background,
-      highlightColor: context.colorScheme.tertiary,
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.colorScheme.tertiary,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        width: context.highValue * 3,
-        height: context.highValue * 3,
-      ),
     );
   }
 

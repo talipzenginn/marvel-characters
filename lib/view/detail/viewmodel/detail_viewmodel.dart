@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/secret_constants.dart';
 import '../../../view/home/model/character_model.dart';
 import '../../../../core/init/network/network_manager.dart';
 import '../../../core/init/navigation/router.gr.dart';
@@ -8,11 +12,24 @@ import '../../home/model/response_model.dart';
 class DetailViewmodel {
   List<ComicModel> comicList = [];
 
+  int limit = 10;
+
+  String orderByParameter = '-onsaleDate';
+
   Future getResponse(CharacterModel characterModel) async {
+    int timeStamp = DateTime.now().millisecondsSinceEpoch;
+
+    String input = timeStamp.toString() +
+        SecretConstants.privateKey +
+        AppConstants.publicKey;
+
+    String hashCode = md5.convert(utf8.encode(input)).toString();
+
     ComicResponseModel comicResponse;
+
     try {
       comicResponse = await NetworkManager.instance!.get(
-        'http://gateway.marvel.com/v1/public/characters/${characterModel.id}/comics?ts=1653404188&apikey=13c8b0b85196e641d2f5148494f69e63&hash=c2d6e264a316e170aa1b2a5244eb88b8&modifiedSince=Sat, 1 Jan 2005 00:00:00 GMT&limit=10&orderBy=-onsaleDate',
+        'characters/${characterModel.id}/comics?ts=$timeStamp&apikey=${AppConstants.publicKey}&hash=$hashCode&limit=$limit&orderBy=$orderByParameter',
         ComicResponseModel.fromJson,
       );
 
