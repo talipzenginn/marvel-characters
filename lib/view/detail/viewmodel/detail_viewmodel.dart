@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/secret_constants.dart';
@@ -37,20 +38,19 @@ class DetailViewmodel {
         ComicResponseModel.fromJson,
       );
       _comicsMaps.clear();
-
-      _comicsMaps.addAll(comicResponse.comicsMapsList!);
+      comicResponse.comicsMapsList!
+          .map((e) =>
+              DateTime.parse(e['dates'][0]['date']).isAfter(DateTime(2005))
+                  ? _comicsMaps.add(e)
+                  : null)
+          .toList();
       _comics = _comicsMaps.map(
         (comicsMap) {
           DateTime dateTime = DateTime.parse(comicsMap['dates'][0]['date']);
-
-          if (dateTime.isAfter(DateTime(2005))) {
-            return ComicModel(
-              title: comicsMap['title']??'No title',
-              onsaleDate: dateTime,
-            );
-          } else {
-            return null;
-          }
+          return ComicModel(
+            title: comicsMap['title'] ?? 'No title',
+            onsaleDate: dateTime,
+          );
         },
       ).toList();
     } catch (e) {
