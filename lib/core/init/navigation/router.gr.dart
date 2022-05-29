@@ -13,6 +13,8 @@
 import 'package:auto_route/auto_route.dart' as _i4;
 import 'package:flutter/material.dart' as _i5;
 import 'package:marvel_characters/view/detail/view/detail_view.dart' as _i3;
+import 'package:marvel_characters/view/detail/viewmodel/detail_viewmodel.dart'
+    as _i7;
 import 'package:marvel_characters/view/home/model/character_model.dart' as _i6;
 import 'package:marvel_characters/view/home/view/home_view.dart' as _i2;
 import 'package:marvel_characters/view/splash/view/splash_view.dart' as _i1;
@@ -36,7 +38,9 @@ class AppRouter extends _i4.RootStackRouter {
       return _i4.AdaptivePage<dynamic>(
           routeData: routeData,
           child: _i3.DetailView(
-              key: args.key, characterModel: args.characterModel));
+              key: args.key,
+              characterModel: args.characterModel,
+              detailViewmodel: args.detailViewmodel));
     }
   };
 
@@ -67,23 +71,32 @@ class HomeRoute extends _i4.PageRouteInfo<void> {
 /// generated route for
 /// [_i3.DetailView]
 class DetailRoute extends _i4.PageRouteInfo<DetailRouteArgs> {
-  DetailRoute({_i5.Key? key, required _i6.CharacterModel characterModel})
+  DetailRoute(
+      {_i5.Key? key,
+      required _i6.CharacterModel characterModel,
+      required _i7.DetailViewmodel detailViewmodel})
       : super(DetailRoute.name,
             path: '/detail-view',
-            args: DetailRouteArgs(key: key, characterModel: characterModel));
+            args: DetailRouteArgs(
+                key: key,
+                characterModel: characterModel,
+                detailViewmodel: detailViewmodel));
 
   static const String name = 'DetailRoute';
 }
 
 class DetailRouteArgs {
-  const DetailRouteArgs({this.key, required this.characterModel});
+  const DetailRouteArgs(
+      {this.key, required this.characterModel, required this.detailViewmodel});
 
   final _i5.Key? key;
 
   final _i6.CharacterModel characterModel;
 
+  final _i7.DetailViewmodel detailViewmodel;
+
   @override
   String toString() {
-    return 'DetailRouteArgs{key: $key, characterModel: $characterModel}';
+    return 'DetailRouteArgs{key: $key, characterModel: $characterModel, detailViewmodel: $detailViewmodel}';
   }
 }
