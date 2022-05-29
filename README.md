@@ -10,6 +10,5 @@ Geçmişten günümüze tüm Marvel karakterlerini, açıklamalarını ve bu kar
 
 
 
-
-https://user-images.githubusercontent.com/65001246/170478417-d9745cea-a1ae-4e2b-92ae-fbd711675a9d.mp4
+https://user-images.githubusercontent.com/65001246/170871259-d55feeae-f9e9-4f84-a87e-d367811ed641.mp4
 
