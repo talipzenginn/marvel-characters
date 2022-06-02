@@ -40,7 +40,7 @@ class CustomFutureBuilder<T> extends StatelessWidget {
               return notFoundWidget ??
                   Center(
                     child: Text(
-                      AppConstants.emptyText,
+                      AppConstants.noConnectionText,
                       style: context.textTheme.subtitle1,
                     ),
                   );

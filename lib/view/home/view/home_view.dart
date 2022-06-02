@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/extension/context_extensions.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../view/home/view/lazy_listview.dart';
-import '../../../../core/extension/context_extensions.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../viewmodel/home_viewmodel.dart';
 
 class HomeView extends StatelessWidget {

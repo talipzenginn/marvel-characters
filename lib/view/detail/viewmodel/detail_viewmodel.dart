@@ -1,10 +1,12 @@
-import 'dart:convert';
-import 'dart:math';
-import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../core/base/model/dio_exceptions.dart';
+import '../../../core/components/dialog/error_dialog.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/secret_constants.dart';
+import '../../../core/extension/hashing_extension.dart';
+import '../../../core/init/network/network_manager.dart';
 import '../../../view/home/model/character_model.dart';
-import '../../../../core/init/network/network_manager.dart';
 import '../../home/model/comic_model.dart';
 import '../../home/model/response_model.dart';
 
@@ -19,7 +21,8 @@ class DetailViewmodel {
   List<ComicModel?> _comics = [];
   List<ComicModel?> get comics => _comics;
 
-  Future fetchComics(CharacterModel characterModel) async {
+  Future fetchComics(
+      CharacterModel characterModel, BuildContext context) async {
     if (_isFetchingComics) return;
     _isFetchingComics = true;
 
@@ -29,7 +32,7 @@ class DetailViewmodel {
         SecretConstants.privateKey +
         AppConstants.publicKey;
 
-    String hashCode = md5.convert(utf8.encode(input)).toString();
+    String hashCode = HashingExtension.generateMd5(input);
 
     ComicResponseModel comicResponse;
     try {
@@ -53,6 +56,12 @@ class DetailViewmodel {
           );
         },
       ).toList();
+    } on DioError catch (e) {
+      ErrorExtension(
+        ErrorDialog(
+          errorMessage: DioExceptions.fromDioError(e).message!,
+        ),
+      ).show(context);
     } catch (e) {
       rethrow;
     }

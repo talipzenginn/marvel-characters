@@ -1,5 +1,5 @@
-import '../../../../core/init/navigation/router.gr.dart';
-import '../../../../main.dart';
+import '../../../core/init/navigation/router.gr.dart';
+import '../../../main.dart';
 
 class SplashViewmodel {
   void navigateToHomeScreen() {

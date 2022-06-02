@@ -20,7 +20,7 @@ class _LazyListViewState extends State<LazyListView> {
     super.initState();
     detailViewmodel = DetailViewmodel();
     scrollController.addListener(scrollListener);
-    widget.viewmodel.fetchNextCharacters();
+    widget.viewmodel.fetchNextCharacters(context);
   }
 
   @override
@@ -34,7 +34,7 @@ class _LazyListViewState extends State<LazyListView> {
             scrollController.position.maxScrollExtent / 2 &&
         !scrollController.position.outOfRange) {
       if (widget.viewmodel.hasNext) {
-        widget.viewmodel.fetchNextCharacters();
+        widget.viewmodel.fetchNextCharacters(context);
       }
     }
   }

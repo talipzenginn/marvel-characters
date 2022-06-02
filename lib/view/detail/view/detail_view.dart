@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../core/components/custom_future_builder.dart';
 import '../../../core/components/shimmers.dart';
-import './/view/home/model/character_model.dart';
-import '../../../../core/extension/context_extensions.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../core/extension/context_extensions.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../view/home/model/character_model.dart';
 import '../viewmodel/detail_viewmodel.dart';
 
 class DetailView extends StatelessWidget {
@@ -55,7 +55,7 @@ class DetailView extends StatelessWidget {
 
   Text nameOfCharacter(BuildContext context) {
     return Text(
-      characterModel.name ?? AppConstants.emptyText,
+      characterModel.name ?? AppConstants.noConnectionText,
       style: context.textTheme.headline5,
     );
   }
@@ -75,25 +75,27 @@ class DetailView extends StatelessWidget {
 
   Widget comicsOfTheCharacter(BuildContext context) {
     return CustomFutureBuilder(
-      future: detailViewmodel.fetchComics(characterModel),
+      future: detailViewmodel.fetchComics(characterModel, context),
       onSuccess: (response) {
         dynamic comics = response;
-        return Column(
-          children: [
-            ...comics
-                .map(
-                  (e) => Padding(
-                    padding: context.paddingNormal,
-                    child: Text(
-                      '${e?.title} ----- ${e?.onsaleDate.day}.${e?.onsaleDate.month}.${e?.onsaleDate.year}',
-                      style: context.textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-                .toList(),
-          ],
-        );
+        return comics.isNotEmpty
+            ? Column(
+                children: [
+                  ...comics
+                      .map(
+                        (e) => Padding(
+                          padding: context.paddingNormal,
+                          child: Text(
+                            '${e?.title} ----- ${e?.onsaleDate.day}.${e?.onsaleDate.month}.${e?.onsaleDate.year}',
+                            style: context.textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ],
+              )
+            : const Text(AppConstants.noComics);
       },
     );
   }

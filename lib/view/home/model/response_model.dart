@@ -1,10 +1,10 @@
 import 'dart:collection';
 
 class CharacterResponseModel {
+  CharacterResponseModel({this.characterMapsList, this.count});
+
   List? characterMapsList;
   int? count;
-
-  CharacterResponseModel({this.characterMapsList, this.count});
 
   factory CharacterResponseModel.fromJson(Map<String, dynamic> json) {
     LinkedHashMap<dynamic, dynamic> map = json['data'];
@@ -18,8 +18,10 @@ class CharacterResponseModel {
 }
 
 class ComicResponseModel {
-  List? comicsMapsList;
   ComicResponseModel({this.comicsMapsList});
+
+  List? comicsMapsList;
+
   factory ComicResponseModel.fromJson(Map<String, dynamic> json) {
     LinkedHashMap<dynamic, dynamic> map = json['data'];
     var hashMap = HashMap.from(map);

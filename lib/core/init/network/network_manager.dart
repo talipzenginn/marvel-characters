@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import '../../../core/init/network/retry_interceptor.dart';
 import '../../constants/app_constants.dart';
 
 class NetworkManager {
@@ -17,6 +18,7 @@ class NetworkManager {
 
     _dio!.interceptors.clear();
     _dio!.interceptors.add(PrettyDioLogger());
+    _dio!.interceptors.add(RetryInterceptor(dio: _dio!));
     _dio!.interceptors.add(InterceptorsWrapper(
       onError: (e, handler) {
         handler.next(e);

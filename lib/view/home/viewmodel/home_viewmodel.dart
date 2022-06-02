@@ -1,12 +1,14 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import '../../../view/detail/viewmodel/detail_viewmodel.dart';
+import '../../../core/components/dialog/error_dialog.dart';
+import '../../../core/base/model/dio_exceptions.dart';
+import '../../../core/extension/hashing_extension.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/secret_constants.dart';
-import './/view/home/model/character_model.dart';
-import '../../../../core/init/network/network_manager.dart';
+import '../../../core/init/network/network_manager.dart';
 import '../../../core/init/navigation/router.gr.dart';
+import '../../../view/home/model/character_model.dart';
+import '../../../view/detail/viewmodel/detail_viewmodel.dart';
 import '../../../main.dart';
 import '../model/response_model.dart';
 
@@ -38,7 +40,7 @@ class HomeViewmodel extends ChangeNotifier {
       )
       .toList();
 
-  Future fetchNextCharacters() async {
+  Future fetchNextCharacters(BuildContext context) async {
     if (_isFetchingCharacters) return;
     _isFetchingCharacters = true;
 
@@ -48,7 +50,7 @@ class HomeViewmodel extends ChangeNotifier {
         SecretConstants.privateKey +
         AppConstants.publicKey;
 
-    String hashCode = md5.convert(utf8.encode(input)).toString();
+    String hashCode = HashingExtension.generateMd5(input);
 
     CharacterResponseModel response;
     try {
@@ -60,13 +62,22 @@ class HomeViewmodel extends ChangeNotifier {
       );
 
       _characterMaps.addAll(response.characterMapsList!);
+
       countOfCharacters = response.count!;
+
       if (response.characterMapsList!.length < limit) _hasNext = false;
+
       notifyListeners();
+    } on DioError catch (e) {
+      ErrorExtension(
+        ErrorDialog(
+          errorMessage: DioExceptions.fromDioError(e).message!,
+        ),
+      ).show(context);
     } catch (e) {
-      notifyListeners();
       rethrow;
     }
+
     _isFetchingCharacters = false;
   }
 
