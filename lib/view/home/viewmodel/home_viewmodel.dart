@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import '../../../core/components/dialog/error_dialog.dart';
 import '../../../core/base/model/dio_exceptions.dart';
 import '../../../core/extension/hashing_extension.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/secret_constants.dart';
-import '../../../core/init/network/network_manager.dart';
 import '../../../core/init/navigation/router.gr.dart';
 import '../../../view/home/model/character_model.dart';
 import '../../../view/detail/viewmodel/detail_viewmodel.dart';
+import '../../../view/home/service/home_service.dart';
 import '../../../main.dart';
 import '../model/response_model.dart';
 
@@ -56,10 +56,8 @@ class HomeViewmodel extends ChangeNotifier {
     try {
       offset += 30;
 
-      response = await NetworkManager.instance!.get(
-        'characters?ts=$timeStamp&apikey=${AppConstants.publicKey}&hash=$hashCode&offset=$offset&limit=$limit',
-        CharacterResponseModel.fromJson,
-      );
+      response =
+          await HomeService.getCharacters(timeStamp, hashCode, offset, limit);
 
       _characterMaps.addAll(response.characterMapsList!);
 
